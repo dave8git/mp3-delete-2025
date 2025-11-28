@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP3 Player</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="player-container">
+        <div class="song-info">
+            <h1 id="song-title">No song loaded</h1>
+            <p id="song-artist">---</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="time" id="current-time">0:00</div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="time" id="duration">0:00</div>
+        </div>
+
+        <div class="controls">
+            <button id="prev-btn" class="control-btn" aria-label="Previous">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                </svg>
+            </button>
+
+            <button id="play-pause-btn" class="control-btn play-btn" aria-label="Play/Pause">
+                <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                    <path d="M6 4h4v16H6zm8 0h4v16h-4z"/>
+                </svg>
+            </button>
+
+            <button id="next-btn" class="control-btn" aria-label="Next">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 18h2V6h-2zm-11-7l8.5-6v12z"/>
+                </svg>
+            </button>
+
+            <button id="delete-btn" class="control-btn delete-btn" aria-label="Delete">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "mp3-delete-2025",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "devDependencies": {
+    "electron": "^39.2.4"
+  },
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "music-metadata": "^11.10.3"
+  }
+}
