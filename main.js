@@ -15,7 +15,7 @@ function createWindow() {
         backgroundColor: '#121212',
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            nodeIntegration: false, 
+            nodeIntegration: false,
             contextIsolation: true,
             sandbox: true
         }
@@ -36,7 +36,7 @@ ipcMain.handle('uploadFiles', async () => {
             for (const entry of entries) {
                 const fullPath = path.join(dir, entry.name);
 
-                if(entry.isDirectory()) {
+                if (entry.isDirectory()) {
                     const subFiles = await findMP3Files(fullPath);
                     mp3Files = mp3Files.concat(subFiles);
                 } else if (entry.isFile() && path.extname(entry.name).toLowerCase() === '.mp3') {
@@ -49,8 +49,17 @@ ipcMain.handle('uploadFiles', async () => {
         const filePaths = await findMP3Files(musicFolder);
         console.log('filePaths', filePaths);
 
-        const promisesFilePaths = await Promise.all(filePaths.map((filePath) => {
-            return mm.parseFile(filePath);
+        const promisesFilePaths = await Promise.all(filePaths.map((filePath) => { // Promise.all() oczekuje a zostan odczytane metadane dla kadego pliku - jezeli przynajmniej jeden nie zwroci poprawnie calosc i zwrocona zostanie pusta tablica // wiec zamiast tego zwracamy null
+            try {
+                return mm.parseFile(filePath);
+            } catch (err) {
+                console.warn('Metadata parse failed for:', filePath.err);
+                // return filePaths.map((file, index) => ({  // --> Mozemy wyfiltrowac pliki na ktorych byl blad i je zwrocic // w tym celu nalezy odkomentowac ten kod
+                //     file,
+                //     metadata: promisesFilePaths[index] || {},
+                // }));
+                return null;
+            }
         }));
 
         console.log('promisesFilePaths', promisesFilePaths);
