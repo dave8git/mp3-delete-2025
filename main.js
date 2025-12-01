@@ -62,8 +62,6 @@ ipcMain.handle('uploadFiles', async () => {
             }
         }));
 
-        console.log('promisesFilePaths', promisesFilePaths);
-
         return filePaths.map((file, index) => {
             return {
                 file,
@@ -73,6 +71,26 @@ ipcMain.handle('uploadFiles', async () => {
     } catch (error) {
         console.error('Error reading music folder:', error);
         return [];
+    }
+});
+
+// ipcMain.handle('deleteFile', async (event, filePath) => {
+//     try {
+//         await fs.unlink(filePath);
+//         return { success: true };
+//     } catch {
+//         console.error('Failed to delete file');
+//         return { success: false };
+//     }
+// });
+
+ipcMain.handle('deleteFile', async (event, filePath) => {
+    try {
+        await fs.unlink(filePath);
+        return { success: true };
+    } catch (err) {
+        console.error('Failed to delete file:', err);
+        return { success: false, error: err.message };
     }
 });
 

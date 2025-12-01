@@ -3,4 +3,5 @@ const { pathToFileURL } = require('url');
 
 contextBridge.exposeInMainWorld('electronAPI', {
     loadFiles: () => ipcRenderer.invoke('uploadFiles'),
+    deleteFile: (filePath) => ipcRenderer.invoke('deleteFile', filePath),
 });
