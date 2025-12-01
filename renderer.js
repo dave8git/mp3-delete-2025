@@ -2,6 +2,8 @@ const playPauseBtn = document.getElementById('play-pause-btn');
 const deleteBtn = document.getElementById('delete-btn');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
+const songTitle = document.getElementById('song-title');
+const songArtist = document.getElementById('song-artist');
 let musicFiles;
 let audioPlayer = new Audio();
 let currentIndex = 0;
@@ -9,11 +11,17 @@ console.log('musicFiles', musicFiles);
 
 function loadSong(index) {
     audioPlayer.src = musicFiles[index].file;
+    loadDisplay(musicFiles[index].metadata.common);
     audioPlayer.play().catch(err => {
         console.error('Failed to play:');
         console.log('File cannot be opened!');
     });
 };
+
+function loadDisplay(metadata) {
+    songTitle.innerText = metadata.title;
+    songArtist.innerText = metadata.artist;
+}
 
 function nextSong() {
     currentIndex++;
