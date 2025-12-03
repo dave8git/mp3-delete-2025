@@ -49,14 +49,15 @@ async function findMP3Files(dir) {
 }
 
 async function parseInBatches(arr, batchSize = 5) {
-    const result = [];
+    const results = [];
     for (let i = 0; i < arr.length; i += batchSize) {
         const slice = arr.slice(i, i + batchSize);
-        for (const file of slice) {
-            result.push(await mm.parseFile(file));
-        }
+        const batchResult = await Promise.all(slice.map(file =>
+            mm.parseFile(file).catch(() => null)
+        ));
+        results.push(...batchResult);
     }
-    return result;
+    return results;
 }
 
 // IPC handlers
