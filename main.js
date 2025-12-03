@@ -15,14 +15,14 @@ function createWindow() {
         frame: false,
         transparent: true,
         backgroundColor: '#00000000',
-        webgl: false,          // disable GPU-heavy WebGL
-        experimentalFeatures: false,
-        spellcheck: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
             contextIsolation: true,
-            sandbox: true
+            sandbox: false,
+            webgl: false,          // disable GPU-heavy WebGL
+            experimentalFeatures: false,
+            spellcheck: false,
         }
     });
 
@@ -30,46 +30,48 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
 }
 
+// Utils
+
+async function findMP3Files(dir) {
+    let mp3Files = [];
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            const subFiles = await findMP3Files(fullPath);
+            mp3Files = mp3Files.concat(subFiles);
+        } else if (entry.isFile() && path.extname(entry.name).toLowerCase() === '.mp3') {
+            mp3Files.push(fullPath);
+        }
+    }
+    return mp3Files;
+}
+
+async function parseInBatches(arr, batchSize = 5) {
+    const result = [];
+    for (let i = 0; i < arr.length; i += batchSize) {
+        const slice = arr.slice(i, i + batchSize);
+        for (const file of slice) {
+            result.push(await mm.parseFile(file));
+        }
+    }
+    return result;
+}
+
+// IPC handlers
+
 ipcMain.handle('uploadFiles', async () => {
     const musicFolder = path.join(os.homedir(), 'Music');
 
     try {
-        async function findMP3Files(dir) {
-            let mp3Files = [];
-            const entries = await fs.readdir(dir, { withFileTypes: true });
-
-            for (const entry of entries) {
-                const fullPath = path.join(dir, entry.name);
-                if (entry.isDirectory()) {
-                    const subFiles = await findMP3Files(fullPath);
-                    mp3Files = mp3Files.concat(subFiles);
-                } else if (entry.isFile() && path.extname(entry.name).toLowerCase() === '.mp3') {
-                    mp3Files.push(fullPath);
-                }
-            }
-            return mp3Files;
-        }
-
         const filePaths = await findMP3Files(musicFolder);
-        console.log('filePaths', filePaths);
-
-        const promisesFilePaths = await Promise.all(filePaths.map((filePath) => { // Promise.all() oczekuje a zostan odczytane metadane dla kadego pliku - jezeli przynajmniej jeden nie zwroci poprawnie calosc i zwrocona zostanie pusta tablica // wiec zamiast tego zwracamy null
-            try {
-                return mm.parseFile(filePath);
-            } catch (err) {
-                console.warn('Metadata parse failed for:', filePath.err);
-                // return filePaths.map((file, index) => ({  // --> Mozemy wyfiltrowac pliki na ktorych byl blad i je zwrocic // w tym celu nalezy odkomentowac ten kod
-                //     file,
-                //     metadata: promisesFilePaths[index] || {},
-                // }));
-                return null;
-            }
-        }));
+        const parsedFiles = await parseInBatches(filePaths);
 
         return filePaths.map((file, index) => {
             return {
                 file,
-                metadata: promisesFilePaths[index],
+                metadata: parsedFiles[index],
             }
         });
     } catch (error) {
@@ -87,6 +89,8 @@ ipcMain.handle('deleteFile', async (event, filePath) => {
         return { success: false };
     }
 });
+
+// APP Lifecycle
 
 app.disableHardwareAcceleration();
 
