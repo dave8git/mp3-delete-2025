@@ -4,17 +4,14 @@ const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const songTitle = document.getElementById('song-title');
 const songArtist = document.getElementById('song-artist');
-
 let musicFiles;
 let audioPlayer = new Audio();
 let currentIndex = 0;
-console.log('musicFiles', musicFiles);
 
 function loadSong(index) {
     audioPlayer.src = musicFiles[index].file;
     loadDisplay(musicFiles[index].metadata.common);
     audioPlayer.play().catch(err => {
-        console.error('Failed to play:');
         console.log('File cannot be opened!');
     });
 };
@@ -37,8 +34,7 @@ function prevSong() {
 }
 
 playPauseBtn.addEventListener('click', async () => {
-    console.log('song loaded');
-    if (audioPlayer.pause) {
+    if (audioPlayer.paused) {
         loadSong(currentIndex);
     } else {
         audioPlayer.pause();
@@ -58,9 +54,7 @@ deleteBtn.addEventListener('click', async () => {
     audioPlayer.src = "";
     audioPlayer.load();
     await new Promise(res => setTimeout(res, 50));
-    console.log('musicFiles[currentIndex]', musicFiles[currentIndex].file);
     const result = await window.electronAPI.deleteFile(musicFiles[currentIndex].file);
-    console.log('result', result);
     if(result.success) {
         musicFiles.splice(currentIndex, 1);
         if (musicFiles.length > 0) {

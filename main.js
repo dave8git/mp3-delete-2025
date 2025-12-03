@@ -12,7 +12,12 @@ function createWindow() {
         height: 600,
         minWidth: 800,
         minHeight: 500,
-        backgroundColor: '#121212',
+        frame: false,
+        transparent: true,
+        backgroundColor: '#00000000',
+        webgl: false,          // disable GPU-heavy WebGL
+        experimentalFeatures: false,
+        spellcheck: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
@@ -35,7 +40,6 @@ ipcMain.handle('uploadFiles', async () => {
 
             for (const entry of entries) {
                 const fullPath = path.join(dir, entry.name);
-
                 if (entry.isDirectory()) {
                     const subFiles = await findMP3Files(fullPath);
                     mp3Files = mp3Files.concat(subFiles);
@@ -74,25 +78,17 @@ ipcMain.handle('uploadFiles', async () => {
     }
 });
 
-// ipcMain.handle('deleteFile', async (event, filePath) => {
-//     try {
-//         await fs.unlink(filePath);
-//         return { success: true };
-//     } catch {
-//         console.error('Failed to delete file');
-//         return { success: false };
-//     }
-// });
-
 ipcMain.handle('deleteFile', async (event, filePath) => {
     try {
         await fs.unlink(filePath);
         return { success: true };
-    } catch (err) {
-        console.error('Failed to delete file:', err);
-        return { success: false, error: err.message };
+    } catch {
+        console.error('Failed to delete file');
+        return { success: false };
     }
 });
+
+app.disableHardwareAcceleration();
 
 app.whenReady().then(() => {
     createWindow();

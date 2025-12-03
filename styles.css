@@ -6,7 +6,8 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+    background: transparent;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,6 +15,17 @@ body {
     padding: 20px;
     -webkit-user-select: none;
     user-select: none;
+}
+
+.player-container {
+    -webkit-app-region: drag;
+}
+
+.control-btn,
+.control-btn *,
+.delete-btn,
+.delete-btn * {
+    -webkit-app-region: no-drag;
 }
 
 .player-container {
